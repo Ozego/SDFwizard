@@ -49,6 +49,7 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
+                i.uv += _Time.xx*float2(1,1.618034);
                 fixed4 col = 0;
 
                 half4 coord = tex2D(_CoordTex, i.uv-1/_PixelParams.xy);
@@ -56,10 +57,10 @@
                 fixed4 tex = tex2D(_MainTex, i.uv-(i.uv*_PixelParams.xy%1+.5)/_PixelParams.xy);
                 col = tex2D(_MainTex, coord.rg/_PixelParams.xy);
                 col.rgb*=col.a;
-                col.a=1;
                 col.rgb *= smoothstep(.9,1,sin(coord.b*1.15-_Time.y))*.25+smoothstep(-.1,.1,sin((coord.b*1.15-_Time.y)*.5-.8))*.05+.1;
                 col.rgb *= 1-tex.a;
                 col.rgb = saturate(col.rgb);
+                col.a=1;
                 col.rgb += tex.rgb*tex.a;
 
 

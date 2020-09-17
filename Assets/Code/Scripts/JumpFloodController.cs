@@ -82,7 +82,7 @@ public class JumpFloodController : MonoBehaviour
     {
         for (int i = 0; i < blitTextures.Length; i++)
         {
-            if (blitTextures[i] == null)
+            if ( blitTextures[i] == null || blitTextures[i].width != sourceTexture.width || blitTextures[i].height != sourceTexture.height )
             {
                 blitTextures[i] = new RenderTexture
                 (
@@ -91,18 +91,13 @@ public class JumpFloodController : MonoBehaviour
                     16,
                     RenderTextureFormat.ARGBHalf
                 );
+                blitTextures[i].antiAliasing = 2;
+                blitTextures[i].anisoLevel = 0;
+                blitTextures[i].filterMode = FilterMode.Bilinear;
+                blitTextures[i].useMipMap = false;
+                blitTextures[i].wrapMode = TextureWrapMode.Repeat;
             }
-            else if (blitTextures[i].width != sourceTexture.width | blitTextures[i].height != sourceTexture.height)
-            {
-                blitTextures[i] = new RenderTexture
-                (
-                    sourceTexture.width,
-                    sourceTexture.height,
-                    16,
-                    RenderTextureFormat.ARGBHalf
-                );
-            }
-            // blitTextures[i].filterMode = FilterMode.Point;
+
         }
     }
 }
