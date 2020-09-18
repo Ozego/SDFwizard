@@ -49,7 +49,7 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                i.uv += _Time.xx*float2(1,1.618034);
+                i.uv += sin(_Time.yy*float2(1,1.618034))*.1;
                 fixed4 col = 0;
 
                 half4 coord = tex2D(_CoordTex, i.uv-1/_PixelParams.xy);

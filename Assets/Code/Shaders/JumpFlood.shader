@@ -12,7 +12,7 @@
         CGINCLUDE
         #pragma vertex vert
         #pragma fragment frag
-
+        #pragma multi_compile __ __REPEAT 
 
         #include "UnityCG.cginc"
 
@@ -42,7 +42,7 @@
 
         half4 texMain(half2 UV) 
         {
-            return tex2D(_MainTex, ((floor(UV)+.5)/_PixelParams.xy+1)%1);
+            return tex2D(_MainTex, (floor(UV)+.5)/_PixelParams.xy);
         }
 
         ENDCG
@@ -66,8 +66,6 @@
                             minDist = dist;
                             o.a = 1;
                             o.rg = i.uv+offset;
-                            o.rg += _PixelParams.xy;
-                            o.rg %= _PixelParams.xy;
                         }
                     }
                 }
@@ -91,6 +89,7 @@
                         half2 offset = half2(x,y)*_PixelParams.xy/_PixelParams.w;
                         half4 s =  texMain(i.uv+offset);
                         half dist = _PixelParams.z;
+                        #if defined(__REPEAT)
                         for (float distX=-1; distX<=1; distX++)
                         {
                             for (float distY=-1; distY<=1; distY++)
@@ -98,6 +97,9 @@
                                 dist = (min(dist,distance(i.uv,s.rg+float2(distX,distY)*_PixelParams.xy)));
                             }
                         }
+                        #else
+                        dist = distance(i.uv,s.rg);
+                        #endif
                         if(s.a >0 && dist<minDist)
                         {
                             minDist = dist;

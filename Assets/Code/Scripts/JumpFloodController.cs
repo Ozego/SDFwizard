@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,7 @@ using Random = UnityEngine.Random;
 public class JumpFloodController : MonoBehaviour
 {
     [SerializeField] Texture2D sourceTexture = null;
+    [SerializeField] TextureWrapMode wrapMode = TextureWrapMode.Repeat;
     RenderTexture[] blitTextures = new RenderTexture[2];
     float scale = .01f;
     Material drawMaterial = null;
@@ -35,9 +37,17 @@ public class JumpFloodController : MonoBehaviour
                 jump
             )
         );
+        sourceTexture.wrapMode = wrapMode;
+        if(wrapMode == TextureWrapMode.Repeat) 
+        {
+            blitMaterial.EnableKeyword("__REPEAT");
+        }
+        else 
+        {
+            blitMaterial.DisableKeyword("__REPEAT");
+        }
         Graphics.Blit(sourceTexture, blitTextures[target], blitMaterial, 0);
         int size = math.min(sourceTexture.width, sourceTexture.height);
-
         while(size>1)
         {
             target^=1;
@@ -82,7 +92,7 @@ public class JumpFloodController : MonoBehaviour
     {
         for (int i = 0; i < blitTextures.Length; i++)
         {
-            if ( blitTextures[i] == null || blitTextures[i].width != sourceTexture.width || blitTextures[i].height != sourceTexture.height )
+            if ( blitTextures[i] == null || blitTextures[i].width != sourceTexture.width || blitTextures[i].height != sourceTexture.height || blitTextures[i].wrapMode != wrapMode )
             {
                 blitTextures[i] = new RenderTexture
                 (
@@ -95,7 +105,7 @@ public class JumpFloodController : MonoBehaviour
                 blitTextures[i].anisoLevel = 0;
                 blitTextures[i].filterMode = FilterMode.Bilinear;
                 blitTextures[i].useMipMap = false;
-                blitTextures[i].wrapMode = TextureWrapMode.Repeat;
+                blitTextures[i].wrapMode = wrapMode;
             }
 
         }
