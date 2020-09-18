@@ -1,18 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 using Unity.Mathematics;
 
-using Random = UnityEngine.Random;
-
 public class JumpFloodController : MonoBehaviour
 {
+
     [SerializeField] Texture2D sourceTexture = null;
     [SerializeField] TextureWrapMode wrapMode = TextureWrapMode.Repeat;
     RenderTexture[] blitTextures = new RenderTexture[2];
+    RenderTexture coordTex;
     float scale = .01f;
     Material drawMaterial = null;
     Material blitMaterial = null;
@@ -21,61 +17,22 @@ public class JumpFloodController : MonoBehaviour
         drawMaterial = new Material(Shader.Find("Hidden/Display/JumpFlood"));
         blitMaterial = new Material(Shader.Find("Hidden/JumpFlood"));
     }
+
     void Update()
     {
-        VerifyTextures();
-
-        int target = 0;
-        int jump=2;
-
-        blitMaterial.SetVector(
-            "_PixelParams",
-            new float4(
-                sourceTexture.width,
-                sourceTexture.height,
-                math.length(new float2(sourceTexture.width, sourceTexture.height)),
-                jump
-            )
-        );
-        sourceTexture.wrapMode = wrapMode;
-        if(wrapMode == TextureWrapMode.Repeat) 
-        {
-            blitMaterial.EnableKeyword("__REPEAT");
-        }
-        else 
-        {
-            blitMaterial.DisableKeyword("__REPEAT");
-        }
-        Graphics.Blit(sourceTexture, blitTextures[target], blitMaterial, 0);
-        int size = math.min(sourceTexture.width, sourceTexture.height);
-        while(size>1)
-        {
-            target^=1;
-            jump<<=1;
-            size>>=1;
-
-            blitMaterial.SetVector(
-                "_PixelParams",
-                new float4(
-                    sourceTexture.width,
-                    sourceTexture.height,
-                    math.length(new float2(sourceTexture.width, sourceTexture.height)),
-                    jump
-                )
-            );
-            Graphics.Blit(blitTextures[target ^ 1], blitTextures[target], blitMaterial, 1);
-        }
+        coordTex = GenerateCoords(sourceTexture);
 
         drawMaterial.SetVector(
             "_PixelParams",
             new float4(
-                sourceTexture.width,
-                sourceTexture.height,
-                (float)sourceTexture.width / (float)sourceTexture.height,
-                (float)sourceTexture.height / (float)sourceTexture.width
+                coordTex.width,
+                coordTex.height,
+                (float)coordTex.width / (float)coordTex.height,
+                (float)coordTex.height / (float)coordTex.width
             )
         );
-        drawMaterial.SetTexture("_CoordTex", blitTextures[target]);
+
+        drawMaterial.SetTexture("_CoordTex", coordTex);
         drawMaterial.SetTexture("_MainTex", sourceTexture);
 
         Graphics.DrawProcedural
@@ -88,7 +45,47 @@ public class JumpFloodController : MonoBehaviour
         );
     }
 
-    private void VerifyTextures()
+    RenderTexture GenerateCoords(Texture2D sourceTexture)
+    {
+        VerifyTextures(sourceTexture);
+
+        int target = 0;
+        int jump = 2;
+
+        blitMaterial.SetVector(
+            "_PixelParams",
+            new float4(
+                sourceTexture.width,
+                sourceTexture.height,
+                math.length(new float2(sourceTexture.width, sourceTexture.height)),
+                jump
+            )
+        );
+        sourceTexture.wrapMode = wrapMode;
+        if (wrapMode == TextureWrapMode.Repeat) blitMaterial.EnableKeyword( "__REPEAT");
+        else                                    blitMaterial.DisableKeyword("__REPEAT");
+        
+        Graphics.Blit(sourceTexture, blitTextures[target], blitMaterial, 0);
+        int size = math.min(sourceTexture.width, sourceTexture.height);
+        while (size > 1)
+        {
+            target^=1; jump<<=1; size>>=1;
+
+            blitMaterial.SetVector(
+                "_PixelParams",
+                new float4(
+                    sourceTexture.width,
+                    sourceTexture.height,
+                    math.length(new float2(sourceTexture.width, sourceTexture.height)),
+                    jump
+                )
+            );
+            Graphics.Blit(blitTextures[target ^ 1], blitTextures[target], blitMaterial, 1);
+        }
+        return blitTextures[target];
+    }
+
+    private void VerifyTextures(Texture2D sourceTexture)
     {
         for (int i = 0; i < blitTextures.Length; i++)
         {
