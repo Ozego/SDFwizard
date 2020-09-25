@@ -8,6 +8,7 @@
         Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
         ZWrite Off Lighting Off Fog { Mode Off }
         Blend SrcAlpha OneMinusSrcAlpha 
+        Cull Off
         LOD 100
         
         Pass
@@ -62,7 +63,6 @@
                 col.rgb = saturate(col.rgb);
                 col.a=1;
                 col.rgb += tex.rgb*tex.a;
-
 
                 return col;
             }

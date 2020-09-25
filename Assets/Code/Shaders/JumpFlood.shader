@@ -44,9 +44,13 @@
         {
             return tex2D(_MainTex, (floor(UV)+.5)/_PixelParams.xy);
         }
+        half4 tex(sampler2D tex, half2 UV) 
+        {
+            return tex2D(tex, (floor(UV)+.5)/_PixelParams.xy);
+        }
 
         ENDCG
-
+        //0 mask2flood
         Pass
         {
             CGPROGRAM
@@ -73,7 +77,7 @@
             }
             ENDCG
         }
-
+        //1 floodstep
         Pass
         {
             CGPROGRAM
@@ -110,6 +114,101 @@
                     }
                 }
                 return o;
+            }
+            ENDCG
+        }
+        //2 return texture
+        Pass
+        {
+            CGPROGRAM
+            #pragma multi_compile __MODE_DIST __MODE_UV __MODE_UV_CONTOUR __MODE_RGB_CONTOUR __MODE_RGB_DIST __MODE_RGB
+            float _Distance;
+            sampler2D _EndoTex, _ExoTex;
+            fixed4 frag (v2f i) : SV_Target
+            {
+                half4 endo = tex(_EndoTex,i.uv);
+                half4 exo = tex(_ExoTex,i.uv);
+                exo.rg /= _PixelParams.xy;
+                exo.rg += 1;
+                exo.rg %= 1;
+                half4 o = exo;
+                o.b -= endo.b;
+                float maxDim =max(_PixelParams.x,_PixelParams.y);
+                o.b /= _Distance;
+                o.b =.5-o.b;
+                half4 mTex = tex2D(_MainTex,exo.rg);
+            #if defined(__MODE_DIST)
+                o.rgb=o.b;
+                o.a=1;
+            #elif defined(__MODE_UV)
+                o.a=1;
+            #elif defined(__MODE_UV_CONTOUR)
+                endo.rg /= _PixelParams.xy;
+                endo.rg += 1;
+                endo.rg %= 1;
+                if(o.b>.5)o.rg=endo.rg;
+            #elif defined(__MODE_RGB_CONTOUR)
+                endo.rg /= _PixelParams.xy;
+                endo.rg += 1;
+                endo.rg %= 1;
+                if(o.b>.5)o.rg=endo.rg;
+                mTex = tex2D(_MainTex,o.rg);
+                o.a=o.b;
+                o.rgb=mTex.rgb;
+            #elif defined(__MODE_RGB_DIST)
+                o.a=o.b;
+                o.rgb=mTex.rgb;
+            #elif defined(__MODE_RGB)
+                o.rgb=mTex.rgb;
+                o.a=texMain(i.uv).a;
+            #endif
+                return (fixed4)o;
+            }
+            ENDCG
+        }
+        //3 prep texture
+        Pass
+        {
+            CGPROGRAM
+            float _Treshold;
+            #pragma multi_compile __RED __GREEN __BLUE __ALPHA __MIX 
+            fixed4 frag (v2f i) : SV_Target
+            {
+                fixed4 o = tex2D(_MainTex, (floor(i.uv)+.5)/_PixelParams.xy);
+                fixed m = 0;
+            #if defined(__RED)
+                m = step(_Treshold, o.r);
+            #elif defined(__GREEN)
+                m = step(_Treshold, o.g);
+            #elif defined(__BLUE)
+                m = step(_Treshold, o.b);
+            #elif defined(__ALPHA)
+                m = step(_Treshold, o.a);
+            #elif defined(__MIX)
+                m = step(_Treshold*3, o.r+o.g+o.b);
+            #endif
+                o.a = m;
+                return o;
+            }
+            ENDCG
+        }
+        //4 invert mask
+        Pass
+        {
+            CGPROGRAM
+            float _Distance;
+            fixed4 frag (v2f i) : SV_Target
+            {
+                half4 o = 1;
+                for(float x = -1; x<=1; x++)
+                {
+                    for(float y = -1; y<=1; y++)
+                    {
+                        o = min(o,texMain(i.uv+half2(x,y)));
+                    }
+                }
+                o.a = 1- o.a;
+                return (fixed4)o;
             }
             ENDCG
         }
