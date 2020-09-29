@@ -33,5 +33,9 @@
             <en:Label class="hLabel"  text="Mode:"/>
             <ed:EnumField name="RenderingSelect"/>
         </en:VisualElement>
+        <en:VisualElement class="horizontal">
+            <en:Label class="hLabel"  text="Tiling:"/>
+            <ed:EnumField name="TilingSelect"/>
+        </en:VisualElement>
     </en:ScrollView>
 </en:UXML>

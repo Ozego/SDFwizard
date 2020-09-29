@@ -1,9 +1,6 @@
 using UnityEditor;
 using UnityEngine;
 using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 namespace Ozeg.Tools
@@ -13,9 +10,10 @@ namespace Ozeg.Tools
         [MenuItem("Tools/SDFWizard")]
         public static void ShowExample()
         {
-            SDFWizard wnd = GetWindow<SDFWizard>();
-            wnd.minSize = new Vector2(288,340);
-            wnd.titleContent = new GUIContent("SDFWizard");
+            SDFWizard window = GetWindow<SDFWizard>();
+            window.minSize = new Vector2(288,340);
+            window.name = "SDFWizard";
+            window.titleContent = new GUIContent("SDFWizard");
         }
 
         public void OnEnable()
@@ -28,14 +26,16 @@ namespace Ozeg.Tools
             SliderInt       sizeSlider      = root.Q<SliderInt>     ("SizeSlider");
             IntegerField    sizeField       = root.Q<IntegerField>  ("SizeField");
             Slider          tresholdSlider  = root.Q<Slider>        ("TresholdSlider");
-            FloatField      tresholdField     = root.Q<FloatField>    ("TresholdField");
+            FloatField      tresholdField   = root.Q<FloatField>    ("TresholdField");
             SliderInt       sampleSlider    = root.Q<SliderInt>     ("SampleSlider");
             IntegerField    sampleField     = root.Q<IntegerField>  ("SampleField");
             EnumField       channelSelect   = root.Q<EnumField>     ("ChannelSelect");
             Box             channelDisplay  = root.Q<Box>           ("ChannelDisplay");
-            EnumField       modeSelect = root.Q<EnumField>     ("RenderingSelect");
+            EnumField       modeSelect      = root.Q<EnumField>     ("RenderingSelect");
+            EnumField       tilingSelect    = root.Q<EnumField>     ("TilingSelect");
             channelSelect.Init(SDFUtil.ColorChannel.Alpha);
             modeSelect.Init(SDFUtil.RenderingMode.DistanceOnly);
+            tilingSelect.Init(TextureWrapMode.Repeat);
             bool validated = false;
 
             dropBox.RegisterCallback<DragEnterEvent>((e)=>
@@ -60,10 +60,10 @@ namespace Ozeg.Tools
                     string path = DragAndDrop.paths[i];
                     if(item.GetType() == typeof(Texture2D))
                     {
-                        // string newPath = path.Insert(path.LastIndexOf("."),"_SDF");
                         string newPath = path.Substring(0,path.LastIndexOf("."))+"_SDF.png";
                         string outPath = Application.dataPath.Substring(0,Application.dataPath.Length-6)+newPath;
                         var texture = item as Texture2D;
+                        texture.wrapMode = (TextureWrapMode)tilingSelect.value;
                         var converter = new SDFConverter();
                         var outData = converter.RenderSDF(texture, sizeField.value, tresholdField.value, sampleField.value, channelSelect.value, modeSelect.value);
                         System.IO.File.WriteAllBytes(outPath,outData.EncodeToPNG());
@@ -108,12 +108,12 @@ namespace Ozeg.Tools
             
             tresholdSlider.RegisterCallback<ChangeEvent<float>>((e)=>
             {
-                tresholdField.value=e.newValue;
+                tresholdField.value=1f - e.newValue;
             });
 
             tresholdField.RegisterCallback<ChangeEvent<float>>((e)=>
             {
-                tresholdSlider.value=e.newValue;
+                tresholdSlider.value=1f - e.newValue;
             });
             sampleSlider.RegisterCallback<ChangeEvent<int>>((e)=>
             {

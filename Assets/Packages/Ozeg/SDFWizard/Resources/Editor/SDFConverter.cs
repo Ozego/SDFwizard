@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
-using UnityEngine.Rendering;
-using Unity.Mathematics;
 
 namespace Ozeg.Tools
 {
@@ -13,24 +9,24 @@ namespace Ozeg.Tools
         Material material = null;
         public SDFConverter()
         {
-            material = new Material(Shader.Find("Hidden/JumpFlood"));
+            material = new Material(Shader.Find("Hidden/SDFWizard/JumpFlood"));
         }
 
         public Texture2D RenderSDF(Texture2D source, int distance, float treshold, int upsampling, System.Enum channel, System.Enum mode)
         {
             upsampling--;
-            int maxDim = math.max(source.width,source.height);
+            int maxDim = Mathf.Max(source.width,source.height);
             while(maxDim<<upsampling>2048) upsampling--;
-            upsampling = math.max(0,upsampling);
+            upsampling = Mathf.Max(0,upsampling);
             for (int i = 0; i < 2; i++) blitTextures[i] = SDFUtil.NewRenderTexture(source, upsampling);
             int target = 0;
             int jump = 2;
             material.SetVector(
                 "_PixelParams",
-                new float4(
+                new Vector4(
                     blitTextures[target].width,
                     blitTextures[target].height,
-                    math.length(new float2(blitTextures[target].width, blitTextures[target].height)),
+                    Vector2.Distance( Vector2.zero, new Vector2(blitTextures[target].width, blitTextures[target].height)),
                     jump
                 )
             );
@@ -39,7 +35,6 @@ namespace Ozeg.Tools
                 material.EnableKeyword( "__REPEAT");
             else
                 material.DisableKeyword("__REPEAT");
-
 
             var channelDict = new Dictionary<System.Enum,string>()
             {
@@ -55,16 +50,16 @@ namespace Ozeg.Tools
             var exoTexture = new RenderTexture(blitTextures[target]);
             Graphics.Blit(source,exoTexture,material,3);
             Graphics.Blit(exoTexture, blitTextures[target], material, 0);
-            int size = math.min(source.width, source.height);
+            int size = Mathf.Min(source.width, source.height);
             while (size > 1)
             {
                 target^=1; jump<<=1; size>>=1;
                 material.SetVector(
                     "_PixelParams",
-                    new float4(
+                    new Vector4(
                         blitTextures[target].width,
                         blitTextures[target].height,
-                        math.length(new float2(blitTextures[target].width, blitTextures[target].height)),
+                        Vector2.Distance( Vector2.zero, new Vector2(blitTextures[target].width, blitTextures[target].height)),
                         jump
                     )
                 );
@@ -73,7 +68,7 @@ namespace Ozeg.Tools
             target^=1;
             Graphics.Blit(exoTexture,blitTextures[target], material, 4);
             Graphics.Blit(blitTextures[target^1],exoTexture);
-            size = math.min(source.width, source.height);
+            size = Mathf.Min(source.width, source.height);
             jump = 2;
             target^=1;
             Graphics.Blit(blitTextures[target^1], blitTextures[target], material, 0);
@@ -82,10 +77,10 @@ namespace Ozeg.Tools
                 target^=1; jump<<=1; size>>=1;
                 material.SetVector(
                     "_PixelParams",
-                    new float4(
+                    new Vector4(
                         blitTextures[target].width,
                         blitTextures[target].height,
-                        math.length(new float2(blitTextures[target].width, blitTextures[target].height)),
+                        Vector2.Distance( Vector2.zero, new Vector2(blitTextures[target].width, blitTextures[target].height)),
                         jump
                     )
                 );
@@ -115,7 +110,6 @@ namespace Ozeg.Tools
             material.SetTexture("_ExoTex", exoTexture);
             material.SetTexture("_EndoTex", blitTextures[target^1]);
             Graphics.Blit(source,outTexture, material, 2);
-            // Debug.Log($"ST:{source.width} RT:{blitTextures[target].width}, {channelKey}, {modeKey}");
             return SDFUtil.RenderTextureToTexture2D(outTexture);
         }
     }
@@ -145,9 +139,9 @@ namespace Ozeg.Tools
         {
             return NewRenderTexture(source, 1);
         }
+        
         public static RenderTexture NewRenderTexture(Texture2D source, int upsampling)
         {
-
             var rt = new RenderTexture
             (
                 source.width<<upsampling,
