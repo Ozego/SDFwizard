@@ -1,0 +1,53 @@
+* 
+{
+    font-size: 19px;
+    -unity-font: resource("Fonts/bedstead");
+}
+Label
+{
+    align-self: center;
+}
+EnumField
+{
+    flex-grow: 1;
+}
+SliderInt, Slider
+{
+    flex-grow: 1;
+}
+.root
+{
+    margin: 8px;
+}
+.horizontal
+{
+    margin: 8px, 8px, 4px, 4px;
+    align-content: flex-start;
+    display: flex; 
+    flex-direction: row;
+}
+.hLabel
+{
+    width: 104px;
+}
+.hValue
+{
+    width: 40px;
+}
+#identity
+{   
+    font-size: 39px;
+    align-self: center;
+}
+#DropBox
+{
+    --unity-image: resource("UI/drop");
+    -unity-slice-left: 84;
+    -unity-slice-top: 84;
+    -unity-slice-right: 84;
+    -unity-slice-bottom: 84;
+    align-self: center;
+    height: 256px;
+    width: 256px;
+    margin: 8px;
+}
