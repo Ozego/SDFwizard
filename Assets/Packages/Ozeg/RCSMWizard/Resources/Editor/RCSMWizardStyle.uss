@@ -1,0 +1,30 @@
+Label
+{
+    align-self: center;
+}
+.root
+{
+    margin: 8px;
+}
+.horizontal
+{
+    margin: 4px;
+    align-content: flex-start;
+    display: flex; 
+    flex-direction: row;
+}
+.hLabel
+{
+    width: 86px;
+    flex-grow: 0;
+}
+.hContent
+{
+    flex-grow: 1;
+}
+#identity
+{   
+    -unity-font: resource("Fonts/bedstead");
+    font-size: 39px;
+    align-self: center;
+}

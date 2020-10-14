@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<en:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:en="UnityEngine.UIElements"
+    xmlns:ed="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
+>
+    <en:ScrollView class="root">
+        <en:Label name="identity" text="RCSM Wizard" />
+        <en:VisualElement class="horizontal">
+            <en:Label class="hLabel" text="Height Map:" />
+            <ed:ObjectField class="hContent"  name="heightMapField"/>
+        </en:VisualElement>
+        <en:VisualElement class="horizontal">
+            <en:Label class="hLabel" text="Normal Map:" />
+            <ed:ObjectField class="hContent"  name="normalMapField"/>
+        </en:VisualElement>
+        <ed:ProgressBar name="progress"/>
+    </en:ScrollView>
+</en:UXML>

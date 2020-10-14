@@ -19,8 +19,8 @@ namespace Ozeg.Tools
         public void OnEnable()
         {
             VisualElement root = rootVisualElement;
-            VisualElement vt = Resources.Load<VisualTreeAsset>("Editor/SDFWizard").Instantiate();
-            vt.styleSheets.Add(Resources.Load<StyleSheet>("Editor/SDFWizard"));
+            VisualElement vt = Resources.Load<VisualTreeAsset>("Editor/SDFWizardMarkup").Instantiate();
+            vt.styleSheets.Add(Resources.Load<StyleSheet>("Editor/SDFWizardStyle"));
             root.Add(vt);
             Image           dropBox         = root.Q<Image>         ("DropBox");
             SliderInt       sizeSlider      = root.Q<SliderInt>     ("SizeSlider");
@@ -147,11 +147,5 @@ namespace Ozeg.Tools
                 }
             });
         }
-
-        public void OnDisable()
-        {
-        }
-        
     }
-
 }
