@@ -6,15 +6,24 @@
     xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
 >
     <en:ScrollView class="root">
-        <en:Label name="identity" text="RCSM Wizard" />
+        <en:Label class="identity" text="RCSM Wizard" />
+        <en:Label class="subidentity" text="A Relaxed Cone Step Map Generator" />
+        <en:VisualElement class="horizontal">
+            <en:Label class="hLabel"  text="Algorithm:"/>
+            <ed:EnumField class="hContent" name="algorithmSelect"/>
+        </en:VisualElement>
+                <en:VisualElement class="horizontal">
+            <en:Label class="hLabel"  text="Normal Map:"/>
+            <ed:EnumField class="hContent" name="normalSelect"/>
+        </en:VisualElement>
         <en:VisualElement class="horizontal">
             <en:Label class="hLabel" text="Height Map:" />
             <ed:ObjectField class="hContent"  name="heightMapField"/>
         </en:VisualElement>
-        <en:VisualElement class="horizontal">
+        <en:VisualElement class="horizontal" name="normalMapContainer">
             <en:Label class="hLabel" text="Normal Map:" />
             <ed:ObjectField class="hContent"  name="normalMapField"/>
         </en:VisualElement>
-        <ed:ProgressBar name="progress"/>
+        <en:Button name="runButton" text="▼ Run" />
     </en:ScrollView>
 </en:UXML>

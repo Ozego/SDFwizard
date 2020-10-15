@@ -11,7 +11,7 @@ namespace Ozeg.Tools
         public static void ShowExample()
         {
             SDFWizard window = GetWindow<SDFWizard>();
-            window.minSize = new Vector2(288,340);
+            window.minSize = new Vector2(256,256);
             window.name = "SDFWizard";
             window.titleContent = new GUIContent("SDFWizard");
         }
@@ -22,17 +22,18 @@ namespace Ozeg.Tools
             VisualElement vt = Resources.Load<VisualTreeAsset>("Editor/SDFWizardMarkup").Instantiate();
             vt.styleSheets.Add(Resources.Load<StyleSheet>("Editor/SDFWizardStyle"));
             root.Add(vt);
-            Image           dropBox         = root.Q<Image>         ("DropBox");
-            SliderInt       sizeSlider      = root.Q<SliderInt>     ("SizeSlider");
-            IntegerField    sizeField       = root.Q<IntegerField>  ("SizeField");
-            Slider          tresholdSlider  = root.Q<Slider>        ("TresholdSlider");
-            FloatField      tresholdField   = root.Q<FloatField>    ("TresholdField");
-            SliderInt       sampleSlider    = root.Q<SliderInt>     ("SampleSlider");
-            IntegerField    sampleField     = root.Q<IntegerField>  ("SampleField");
-            EnumField       channelSelect   = root.Q<EnumField>     ("ChannelSelect");
-            Box             channelDisplay  = root.Q<Box>           ("ChannelDisplay");
-            EnumField       modeSelect      = root.Q<EnumField>     ("RenderingSelect");
-            EnumField       tilingSelect    = root.Q<EnumField>     ("TilingSelect");
+            Label           dLabel          = vt.Q<Label>         (null,"dLabel");
+            Image           dropBox         = vt.Q<Image>         ("DropBox");
+            SliderInt       sizeSlider      = vt.Q<SliderInt>     ("SizeSlider");
+            IntegerField    sizeField       = vt.Q<IntegerField>  ("SizeField");
+            Slider          tresholdSlider  = vt.Q<Slider>        ("TresholdSlider");
+            FloatField      tresholdField   = vt.Q<FloatField>    ("TresholdField");
+            SliderInt       sampleSlider    = vt.Q<SliderInt>     ("SampleSlider");
+            IntegerField    sampleField     = vt.Q<IntegerField>  ("SampleField");
+            EnumField       channelSelect   = vt.Q<EnumField>     ("ChannelSelect");
+            Box             channelDisplay  = vt.Q<Box>           ("ChannelDisplay");
+            EnumField       modeSelect      = vt.Q<EnumField>     ("RenderingSelect");
+            EnumField       tilingSelect    = vt.Q<EnumField>     ("TilingSelect");
             channelSelect.Init(SDFUtil.ColorChannel.Alpha);
             modeSelect.Init(SDFUtil.RenderingMode.DistanceOnly);
             tilingSelect.Init(TextureWrapMode.Repeat);
@@ -45,6 +46,7 @@ namespace Ozeg.Tools
                     if(item.GetType() == typeof(Texture2D)) validated = true;
                 }
                 dropBox.tintColor = validated ? new Color(.6f, .94f, .2f) : new Color(.94f, .3f, .2f);
+                dLabel.style.color = validated ? new Color(.6f, .94f, .2f) : new Color(.94f, .3f, .2f);
             });
 
             dropBox.RegisterCallback<DragUpdatedEvent>((e)=>
@@ -84,12 +86,14 @@ namespace Ozeg.Tools
             {
                 validated=false;
                 dropBox.tintColor=Color.white;
+                dLabel.style.color=Color.white;
             });
 
             dropBox.RegisterCallback<DragLeaveEvent>((e)=>
             {
                 validated=false;
                 dropBox.tintColor=Color.white;
+                dLabel.style.color=Color.white;
             });
 
             sizeSlider.RegisterCallback<ChangeEvent<int>>((e)=>

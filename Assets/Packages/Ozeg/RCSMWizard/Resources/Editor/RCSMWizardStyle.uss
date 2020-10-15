@@ -22,9 +22,14 @@ Label
 {
     flex-grow: 1;
 }
-#identity
+.identity
 {   
     -unity-font: resource("Fonts/bedstead");
-    font-size: 39px;
+    font-size: 33px;
     align-self: center;
+}
+.subidentity
+{   
+    -unity-font: resource("Fonts/bedstead");
+    font-size: 10px;
 }

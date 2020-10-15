@@ -6,8 +6,9 @@
     xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
 >
     <en:ScrollView class="root">
-        <en:Label name="identity" text="SDF Wizard" />
-        <en:Label text="Drop texture:" />
+        <en:Label class="identity" text="SDF Wizard" />
+        <en:Label class="subidentity" text="A Signed Distance Field Generator"/>
+        <en:Label class="dLabel" text="Drop texture:" />
         <en:Image name="DropBox"/>
         <en:VisualElement class="horizontal">
             <en:Label class="hLabel" text="Distance:"/>

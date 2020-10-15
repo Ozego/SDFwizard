@@ -1,8 +1,4 @@
-* 
-{
-    font-size: 19px;
-    -unity-font: resource("Fonts/bedstead");
-}
+
 Label
 {
     align-self: center;
@@ -21,33 +17,44 @@ SliderInt, Slider
 }
 .horizontal
 {
-    margin: 8px, 8px, 4px, 4px;
+    margin: 4px;
     align-content: flex-start;
     display: flex; 
     flex-direction: row;
 }
 .hLabel
 {
-    width: 104px;
+    width: 80px;
+    flex-grow: 0;
 }
 .hValue
 {
-    width: 40px;
+    width: 36px;
+    flex-grow: 0;
 }
-#identity
+.identity
 {   
     font-size: 39px;
     align-self: center;
+    -unity-font: resource("Fonts/bedstead");
+}
+.dLabel
+{   
+    margin-top: 12px;
+    margin-bottom: -4px;
+    font-size: 24px;
+    -unity-font: resource("Fonts/bedstead");
+}
+.subidentity
+{   
+    font-size: 10px;
+    -unity-font: resource("Fonts/bedstead");
 }
 #DropBox
 {
     --unity-image: resource("UI/drop");
-    -unity-slice-left: 84;
-    -unity-slice-top: 84;
-    -unity-slice-right: 84;
-    -unity-slice-bottom: 84;
     align-self: center;
-    height: 256px;
-    width: 256px;
+    height: 128px;
+    width: 128px;
     margin: 8px;
 }

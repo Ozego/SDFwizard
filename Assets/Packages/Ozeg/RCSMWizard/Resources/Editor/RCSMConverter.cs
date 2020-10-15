@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-
-public class RCSMConverter
+namespace Ozeg.Tools
 {
+    public class RCSMConverter
+    {
 
+    }
 }
