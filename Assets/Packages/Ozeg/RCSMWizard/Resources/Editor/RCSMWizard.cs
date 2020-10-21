@@ -4,6 +4,7 @@ using System;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using Random = UnityEngine.Random;
+using Object = UnityEngine.Object;
 
 namespace Ozeg.Tools
 {
@@ -20,13 +21,13 @@ namespace Ozeg.Tools
             Generate,
             None
         }
-        [MenuItem("Tools/RCSMWizard")]
+        [MenuItem("Tools/Relaxed Wizard")]
         public static void ShowExample()
         {
             RCSMWizard window = GetWindow<RCSMWizard>();
             window.minSize = new Vector2(256,256);
-            window.name = "SDFWizard";
-            window.titleContent = new GUIContent("RCSMWizard");
+            window.name = "Relaxed Wizard";
+            window.titleContent = new GUIContent("Relaxed Wizard");
         }
         public void OnEnable()
         {
@@ -38,48 +39,92 @@ namespace Ozeg.Tools
             EnumField       normalSelect        = vt.Q<EnumField>       ("normalSelect");
             ObjectField     heightMapField      = vt.Q<ObjectField>     ("heightMapField");
             ObjectField     normalMapField      = vt.Q<ObjectField>     ("normalMapField");
+            SliderInt       stepSlider          = vt.Q<SliderInt>       ("stepSlider");
+            IntegerField    stepField           = vt.Q<IntegerField>    ("stepField");
             Button          runButton           = vt.Q<Button>          ("runButton");
-            algorithmSelect.Init(RCSMAlgorithm.PerPixel);
-            normalSelect.Init(NormalMapOptions.None);
+            EnumField       tilingSelect        = vt.Q<EnumField>       ("TilingSelect");
+            tilingSelect.Init(TextureWrapMode.Repeat);
+
+            normalSelect.Init(NormalMapOptions.Import);
             heightMapField.objectType = typeof(Texture);
             normalMapField.objectType = typeof(Texture);
 
-            algorithmSelect.RegisterCallback<ChangeEvent<Enum>>((e)=>{
-                switch (e.newValue)
-                {
-                    case RCSMAlgorithm.PerPixel: 
-                        break;
-                    case RCSMAlgorithm.JumpFlood:
-                        EditorUtility.DisplayDialog("Selected algorithm does not exist!", "The selected algorithm is not yet available. \nPlease wait for an update", "Ok");
-                        algorithmSelect.value = RCSMAlgorithm.PerPixel;
-                        break;
-                }
-            });
             normalSelect.RegisterCallback<ChangeEvent<Enum>>((e)=>{
                 switch (e.newValue)
                 {
                     case NormalMapOptions.Generate: 
-                        EditorUtility.DisplayDialog("Selected algorithm does not exist!", "The selected algorithm is not yet available. \nPlease wait for an update", "Ok");
-                        normalSelect.value = NormalMapOptions.None;
-                        normalSelect.parent.visible = false;
+                        normalMapField.parent.visible = false;
                         break;
                     case NormalMapOptions.Import: 
-                        normalSelect.parent.visible = true;
+                        normalMapField.parent.visible = true;
                         break;
                     case NormalMapOptions.None:
-                        normalSelect.parent.visible = false;
+                        normalMapField.parent.visible = false;
                         break;
                 }
             });
 
-            normalSelect.parent.visible = false;
-            algorithmSelect.parent.visible = false;
-            normalMapField.parent.visible = false;
+            
+            stepSlider.RegisterCallback<ChangeEvent<int>>((e)=>
+            {
+                stepField.value= e.newValue;
+            });
 
-            normalSelect.parent.RemoveFromHierarchy();
-            algorithmSelect.parent.RemoveFromHierarchy();
-            normalMapField.parent.RemoveFromHierarchy();
+            stepField.RegisterCallback<ChangeEvent<int>>((e)=>
+            {
+                stepSlider.value= e.newValue;
+            });
 
+            heightMapField.RegisterCallback<ChangeEvent<Object>>((e)=>
+            {
+                var value = e.newValue as Texture;
+                if(value!=null) tilingSelect.value = value.wrapMode;
+            });
+            
+            runButton.clickable.clicked += delegate{
+                if(validateParams())
+                {
+                    var heightMap = heightMapField.value as Texture;
+                    heightMap.wrapMode = (TextureWrapMode)tilingSelect.value;
+                    Texture normalMap = null;
+                    switch (normalSelect.value)
+                    {
+                        case NormalMapOptions.Import    :   normalMap = RCSMConverter.ImportNormal(normalMapField.value as Texture);    break;
+                        case NormalMapOptions.Generate  :   normalMap = RCSMConverter.RenderNormal(heightMap as Texture2D);             break;
+                        default                         :   normalMap = RCSMConverter.ImportNormal(null);                               break;
+                    }
+                    Texture coneMap = RCSMConverter.RenderRCSMPerPixel(heightMap as Texture2D, stepField.value);
+                    Texture RCSMap = RCSMConverter.PackRCSM(heightMap,coneMap,normalMap);
+
+                    string path = AssetDatabase.GetAssetPath(heightMap);
+                    string newPath = path.Substring(0,path.LastIndexOf("."))+"_RCSM.png";
+                    string systemPath = Application.dataPath.Substring(0,Application.dataPath.Length-6)+newPath;
+                    System.IO.File.WriteAllBytes(systemPath,WizardUtils.RenderTextureToTexture2D(RCSMap as RenderTexture).EncodeToPNG());
+                    AssetDatabase.Refresh();
+                    var importer = (TextureImporter)AssetImporter.GetAtPath(newPath);
+                    var importerSettings = new TextureImporterSettings();
+                    ((TextureImporter)AssetImporter.GetAtPath(path)).ReadTextureSettings(importerSettings);
+                    importer.SetTextureSettings(importerSettings);
+                    importer.sRGBTexture = false;
+                    importer.textureCompression = TextureImporterCompression.Uncompressed;
+                    importer.mipmapEnabled = false;
+
+                    importer.SaveAndReimport();
+                    AssetDatabase.ImportAsset(newPath);
+                    AssetDatabase.Refresh();
+                }
+            };
+
+            bool validateParams()
+            {
+                if(heightMapField.value==null)
+                {
+                    EditorUtility.DisplayDialog("Error!","Height Map not found!","Ok");
+                    return false;
+                }
+                return true;
+            }
         }
+
     }
 }

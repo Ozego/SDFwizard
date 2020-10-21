@@ -6,7 +6,7 @@
     xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
 >
     <en:ScrollView class="root">
-        <en:Label class="identity" text="SDF Wizard" />
+        <en:Label class="identity" text="Distant Wizard" />
         <en:Label class="subidentity" text="A Signed Distance Field Generator"/>
         <en:Label class="dLabel" text="Drop texture:" />
         <en:Image name="DropBox"/>
@@ -22,8 +22,8 @@
         </en:VisualElement>
         <en:VisualElement class="horizontal">
             <en:Label class="hLabel" text="Upsample:"/>
-            <en:SliderInt name="SampleSlider" value="2" low-value="1" high-value="4"/>
-            <ed:IntegerField name="SampleField" class="hValue" value="2"/>
+            <en:SliderInt name="SampleSlider" value="0" low-value="0" high-value="3"/>
+            <ed:IntegerField name="SampleField" class="hValue" value="0"/>
         </en:VisualElement>
         <en:VisualElement class="horizontal">
             <en:Label class="hLabel"  text="Channel:"/>

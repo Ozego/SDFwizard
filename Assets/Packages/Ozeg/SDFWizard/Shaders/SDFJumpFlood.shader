@@ -46,7 +46,7 @@
             #ifdef __REPEAT
                 UV = (UV+_PixelParams.xy)%_PixelParams.xy;
             #endif
-            return tex2D(tex, (floor(UV)+.5)/_PixelParams.xy);
+            return tex2Dlod(tex, float4((floor(UV)+.5)/_PixelParams.xy,0.,0.));
         }
         half4 texMain(half2 UV) 
         {
@@ -203,11 +203,12 @@
             float _Distance;
             fixed4 frag (v2f i) : SV_Target
             {
-                half4 o = 1;
+                half4 o = texMain(i.uv);
                 for(float x = -1; x<=1; x++)
                 {
                     for(float y = -1; y<=1; y++)
                     {
+                        if(x==y) continue;
                         o = min(o,texMain(i.uv+half2(x,y)));
                     }
                 }

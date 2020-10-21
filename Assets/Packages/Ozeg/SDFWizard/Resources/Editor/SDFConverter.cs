@@ -14,11 +14,10 @@ namespace Ozeg.Tools
 
         public Texture2D RenderSDF(Texture2D source, int distance, float treshold, int upsampling, System.Enum channel, System.Enum mode)
         {
-            upsampling--;
             int maxDim = Mathf.Max(source.width,source.height);
             while(maxDim<<upsampling>2048) upsampling--;
             upsampling = Mathf.Max(0,upsampling);
-            for (int i = 0; i < 2; i++) blitTextures[i] = SDFUtil.NewRenderTexture(source, upsampling);
+            for (int i = 0; i < 2; i++) blitTextures[i] = WizardUtils.NewRenderTexture(source, upsampling);
             int target = 0;
             int jump = 2;
             material.SetVector(
@@ -38,11 +37,11 @@ namespace Ozeg.Tools
 
             var channelDict = new Dictionary<System.Enum,string>()
             {
-                { SDFUtil.ColorChannel.Red,     "__RED" },
-                { SDFUtil.ColorChannel.Green,   "__GREEN" },
-                { SDFUtil.ColorChannel.Blue,    "__BLUE" },
-                { SDFUtil.ColorChannel.Alpha,    "__ALPHA" },
-                { SDFUtil.ColorChannel.mixRGB,  "__MIX" }
+                { WizardUtils.ColorChannel.Red,     "__RED" },
+                { WizardUtils.ColorChannel.Green,   "__GREEN" },
+                { WizardUtils.ColorChannel.Blue,    "__BLUE" },
+                { WizardUtils.ColorChannel.Alpha,    "__ALPHA" },
+                { WizardUtils.ColorChannel.mixRGB,  "__MIX" }
             };
             string channelKey;
             if(channelDict.TryGetValue(channel, out channelKey)) material.EnableKeyword(channelKey);
@@ -96,12 +95,12 @@ namespace Ozeg.Tools
     
             var modeDict = new Dictionary<System.Enum,string>()
             {
-                { SDFUtil.RenderingMode.ContourUV,      "__MODE_UV_CONTOUR" },
-                { SDFUtil.RenderingMode.ContourRGB,     "__MODE_RGB_CONTOUR" },
-                { SDFUtil.RenderingMode.DistanceOnly,   "__MODE_DIST" },
-                { SDFUtil.RenderingMode.NearestUV,      "__MODE_UV" },
-                { SDFUtil.RenderingMode.RGBDistance,    "__MODE_RGB_DIST" },
-                { SDFUtil.RenderingMode.RGBOnly,        "__MODE_RGB" },
+                { SDFConverter.RenderingMode.ContourUV,      "__MODE_UV_CONTOUR" },
+                { SDFConverter.RenderingMode.ContourRGB,     "__MODE_RGB_CONTOUR" },
+                { SDFConverter.RenderingMode.DistanceOnly,   "__MODE_DIST" },
+                { SDFConverter.RenderingMode.NearestUV,      "__MODE_UV" },
+                { SDFConverter.RenderingMode.RGBDistance,    "__MODE_RGB_DIST" },
+                { SDFConverter.RenderingMode.RGBOnly,        "__MODE_RGB" },
             };
             string modeKey;
             if(modeDict.TryGetValue(mode, out modeKey)) material.EnableKeyword(modeKey);
@@ -110,12 +109,8 @@ namespace Ozeg.Tools
             material.SetTexture("_ExoTex", exoTexture);
             material.SetTexture("_EndoTex", blitTextures[target^1]);
             Graphics.Blit(source,outTexture, material, 2);
-            return SDFUtil.RenderTextureToTexture2D(outTexture);
+            return WizardUtils.RenderTextureToTexture2D(outTexture);
         }
-    }
-
-    public static class SDFUtil
-    {
         public enum RenderingMode
         {
             DistanceOnly,
@@ -124,46 +119,6 @@ namespace Ozeg.Tools
             NearestUV,
             ContourUV,
             ContourRGB
-        }
-        
-        public enum ColorChannel
-        {
-            Red,
-            Green,
-            Blue,
-            Alpha,
-            mixRGB
-        }
-
-        public static RenderTexture NewRenderTexture(Texture2D source)
-        {
-            return NewRenderTexture(source, 1);
-        }
-        
-        public static RenderTexture NewRenderTexture(Texture2D source, int upsampling)
-        {
-            var rt = new RenderTexture
-            (
-                source.width<<upsampling,
-                source.height<<upsampling,
-                16,
-                RenderTextureFormat.ARGBHalf
-            );
-            rt.antiAliasing = 2;
-            rt.anisoLevel = 0;
-            rt.filterMode = FilterMode.Bilinear;
-            rt.useMipMap = false;
-            rt.wrapMode = source.wrapMode;
-            return rt;
-        }
-
-        public static Texture2D RenderTextureToTexture2D(this RenderTexture rt)
-        {
-            var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGBA32, false);
-            RenderTexture.active = rt;
-            tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
-            tex.Apply();
-            return tex;
         }
     }
 }

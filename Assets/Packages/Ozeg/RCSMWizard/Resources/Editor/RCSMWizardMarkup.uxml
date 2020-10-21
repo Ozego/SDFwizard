@@ -6,16 +6,8 @@
     xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
 >
     <en:ScrollView class="root">
-        <en:Label class="identity" text="RCSM Wizard" />
+        <en:Label class="identity" text="Relaxed Wizard" />
         <en:Label class="subidentity" text="A Relaxed Cone Step Map Generator" />
-        <en:VisualElement class="horizontal">
-            <en:Label class="hLabel"  text="Algorithm:"/>
-            <ed:EnumField class="hContent" name="algorithmSelect"/>
-        </en:VisualElement>
-                <en:VisualElement class="horizontal">
-            <en:Label class="hLabel"  text="Normal Map:"/>
-            <ed:EnumField class="hContent" name="normalSelect"/>
-        </en:VisualElement>
         <en:VisualElement class="horizontal">
             <en:Label class="hLabel" text="Height Map:" />
             <ed:ObjectField class="hContent"  name="heightMapField"/>
@@ -23,6 +15,19 @@
         <en:VisualElement class="horizontal" name="normalMapContainer">
             <en:Label class="hLabel" text="Normal Map:" />
             <ed:ObjectField class="hContent"  name="normalMapField"/>
+        </en:VisualElement>
+        <en:VisualElement class="horizontal">
+            <en:Label class="hLabel" text="Steps:"/>
+            <en:SliderInt class="hContent" name="stepSlider" value="128" low-value="32" high-value="256"/>
+            <ed:IntegerField name="stepField" class="hValue" value="128"/>
+        </en:VisualElement>
+        <en:VisualElement class="horizontal">
+            <en:Label class="hLabel"  text="Normal Map:"/>
+            <ed:EnumField class="hContent" name="normalSelect"/>
+        </en:VisualElement>
+        <en:VisualElement class="horizontal">
+            <en:Label class="hLabel"  text="Tiling:"/>
+            <ed:EnumField class="hContent" name="TilingSelect"/>
         </en:VisualElement>
         <en:Button name="runButton" text="▼ Run" />
     </en:ScrollView>

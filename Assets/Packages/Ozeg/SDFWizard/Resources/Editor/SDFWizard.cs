@@ -7,13 +7,13 @@ namespace Ozeg.Tools
 {
     public class SDFWizard : EditorWindow
     {
-        [MenuItem("Tools/SDFWizard")]
+        [MenuItem("Tools/Distant Wizard")]
         public static void ShowExample()
         {
             SDFWizard window = GetWindow<SDFWizard>();
             window.minSize = new Vector2(256,256);
-            window.name = "SDFWizard";
-            window.titleContent = new GUIContent("SDFWizard");
+            window.name = "Distant Wizard";
+            window.titleContent = new GUIContent("Distant Wizard");
         }
 
         public void OnEnable()
@@ -34,8 +34,8 @@ namespace Ozeg.Tools
             Box             channelDisplay  = vt.Q<Box>           ("ChannelDisplay");
             EnumField       modeSelect      = vt.Q<EnumField>     ("RenderingSelect");
             EnumField       tilingSelect    = vt.Q<EnumField>     ("TilingSelect");
-            channelSelect.Init(SDFUtil.ColorChannel.Alpha);
-            modeSelect.Init(SDFUtil.RenderingMode.DistanceOnly);
+            channelSelect.Init(WizardUtils.ColorChannel.Alpha);
+            modeSelect.Init(SDFConverter.RenderingMode.DistanceOnly);
             tilingSelect.Init(TextureWrapMode.Repeat);
             bool validated = false;
 
@@ -63,18 +63,18 @@ namespace Ozeg.Tools
                     if(item.GetType() == typeof(Texture2D))
                     {
                         string newPath = path.Substring(0,path.LastIndexOf("."))+"_SDF.png";
-                        string outPath = Application.dataPath.Substring(0,Application.dataPath.Length-6)+newPath;
+                        string systemPath = Application.dataPath.Substring(0,Application.dataPath.Length-6)+newPath;
                         var texture = item as Texture2D;
                         texture.wrapMode = (TextureWrapMode)tilingSelect.value;
                         var converter = new SDFConverter();
                         var outData = converter.RenderSDF(texture, sizeField.value, tresholdField.value, sampleField.value, channelSelect.value, modeSelect.value);
-                        System.IO.File.WriteAllBytes(outPath,outData.EncodeToPNG());
+                        System.IO.File.WriteAllBytes(systemPath,outData.EncodeToPNG());
                         AssetDatabase.Refresh();
                         var importer = (TextureImporter)AssetImporter.GetAtPath(newPath);
                         var importerSettings = new TextureImporterSettings();
                         ((TextureImporter)AssetImporter.GetAtPath(path)).ReadTextureSettings(importerSettings);
                         importer.SetTextureSettings(importerSettings);
-                        importer.sRGBTexture &= modeSelect.value.Equals(SDFUtil.RenderingMode.RGBDistance);
+                        importer.sRGBTexture &= modeSelect.value.Equals(SDFConverter.RenderingMode.RGBDistance);
                         importer.textureCompression = TextureImporterCompression.Uncompressed;
                         importer.SaveAndReimport();
                         AssetDatabase.ImportAsset(newPath);
@@ -133,16 +133,16 @@ namespace Ozeg.Tools
             {
                 switch (e.newValue)
                 {
-                    case SDFUtil.ColorChannel.Red: 
+                    case WizardUtils.ColorChannel.Red: 
                         channelDisplay.style.backgroundColor = new Color(.94f, .3f, .2f); 
                         break;
-                    case SDFUtil.ColorChannel.Green: 
+                    case WizardUtils.ColorChannel.Green: 
                         channelDisplay.style.backgroundColor = new Color(.6f, .94f, .2f); 
                         break;
-                    case SDFUtil.ColorChannel.Blue: 
+                    case WizardUtils.ColorChannel.Blue: 
                         channelDisplay.style.backgroundColor = new Color(.2f, .6f, .94f); 
                         break;
-                    case SDFUtil.ColorChannel.Alpha: 
+                    case WizardUtils.ColorChannel.Alpha: 
                         channelDisplay.style.backgroundColor = Color.grey; 
                         break;
                     default: 
