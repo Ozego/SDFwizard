@@ -50,7 +50,7 @@
             float _Depth;
             v2f vert (appdata v)
             {
-                _RCSMTex_ST.w+=_Time.y*.15;
+                _RCSMTex_ST.w+=_Time.y*.015;
                 v2f o;
                 float3x3 objectToTangent = float3x3( v.tangent.xyz, cross(v.normal,v.tangent.xyz)*v.tangent.w, v.normal );
                 o.ray = mul(objectToTangent, ObjSpaceViewDir(v.vertex));

@@ -87,7 +87,7 @@
             CGPROGRAM
             half4 frag (v2f i) : SV_Target
             {
-                half4 o = tex2D(_MainTex,i.uv);
+                half4 o = 0;
                 o.rg=i.uv*_PixelParams.xy;
                 half minDist = _PixelParams.z;
                 for (half x = -1; x <= 1; x++)
