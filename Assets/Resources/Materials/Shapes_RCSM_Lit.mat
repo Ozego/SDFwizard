@@ -25,14 +25,19 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _RCSMTex:
         m_Texture: {fileID: 2800000, guid: a61b0fdd7177f14469b7b94dc93e2d6b, type: 3}
-        m_Scale: {x: 16, y: 16}
+        m_Scale: {x: 12, y: 12}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - _AO: 1.13
     - _Bias: 0
-    - _BinarySteps: 8
-    - _ConeSteps: 32
-    - _Depth: 0.075
-    - _LightSteps: 4
+    - _BinarySteps: 16
+    - _ConeSteps: 48
+    - _Depth: 0.05
+    - _LightSteps: 7.42
+    - _NormalDepth: 0.15
+    - _Shadow: 0.65
+    - _ShadowLength: 7.23
+    - _ShadowTerminator: 0.15
     m_Colors:
     - _BiasVec: {r: 0.25, g: 2.68, b: 1.25, a: 0}
   m_BuildTextureStacks: []
