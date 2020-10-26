@@ -47,15 +47,17 @@
         }
 
         ENDCG
+        //0 clear
         Pass
         {
-            CGPROGRAM //0   initialize
+            CGPROGRAM 
             fixed4 frag () : SV_Target
             {
                 return fixed4(1,1,1,1);
             }
             ENDCG
         }
+        //1 step
         Pass
         {
             CGPROGRAM
@@ -76,6 +78,7 @@
                     rayPos += ray * (currentDepth <= rayPos.z);
                 }
                 float srcDepth = 1.-tex(_MainTex,src.xy).a;
+                // rayPos.z = min(rayPos.z,.9);
                 float coneRatio = (rayPos.z>=srcDepth)?1.:length((rayPos.xy-start)/_PixelParams.xy)/(srcDepth-rayPos.z);
                 return coneRatio;
             }
@@ -96,10 +99,12 @@
                         }
                     }
                 }
+                // o = tex(_MainTex,i.uv);
                 return o;
             }
             ENDCG
         }
+        //2 in
         Pass 
         {
             CGPROGRAM
@@ -113,13 +118,14 @@
             }
             ENDCG
         }
-        Pass
+        //3 out
+        Pass 
         {
             CGPROGRAM
             fixed4 frag(v2f i) : SV_Target
             {
                 fixed4 o = tex(_MainTex,i.uv);
-                return fixed4(o.b,o.b,o.b,1);
+                return fixed4(o.bbb,1);
             }
             ENDCG
         }

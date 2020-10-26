@@ -93,13 +93,15 @@ namespace Ozeg.Tools
                         case NormalMapOptions.Generate  :   normalMap = RCSMConverter.RenderNormal(heightMap as Texture2D);             break;
                         default                         :   normalMap = RCSMConverter.ImportNormal(null);                               break;
                     }
-                    Texture coneMap = RCSMConverter.RenderRCSMPerPixel(heightMap as Texture2D, stepField.value);
+                    Texture coneMap = RCSMConverter.RenderRCSMFloodJump(heightMap as Texture2D, stepField.value);
                     Texture RCSMap = RCSMConverter.PackRCSM(heightMap,coneMap,normalMap);
 
                     string path = AssetDatabase.GetAssetPath(heightMap);
                     string newPath = path.Substring(0,path.LastIndexOf("."))+"_RCSM.png";
                     string systemPath = Application.dataPath.Substring(0,Application.dataPath.Length-6)+newPath;
                     System.IO.File.WriteAllBytes(systemPath,WizardUtils.RenderTextureToTexture2D(RCSMap as RenderTexture).EncodeToPNG());
+
+                    
                     AssetDatabase.Refresh();
                     var importer = (TextureImporter)AssetImporter.GetAtPath(newPath);
                     var importerSettings = new TextureImporterSettings();

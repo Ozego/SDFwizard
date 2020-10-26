@@ -59,6 +59,56 @@ namespace Ozeg.Tools
             }
             return blitTextures[target];
         }
+        public static RenderTexture RenderRCSMFloodJump(Texture2D src, int steps)
+        {
+            RenderTexture[] blitTextures = new RenderTexture[2];
+            for (int i = 0; i < 2; i++) blitTextures[i] = WizardUtils.NewRenderTexture(src);
+            var material = new Material(Shader.Find("Hidden/RCSMWizard/PerPixel"));
+            material.SetFloat("_Steps",steps);
+
+            material.SetVector(
+                "_PixelParams",
+                new Vector4(
+                    src.width,
+                    src.height,
+                    0,
+                    0
+                )
+            );
+            Graphics.Blit(src,blitTextures[0],material,2);
+            Graphics.Blit(src,blitTextures[1],material,2);
+
+            int target = 0;
+            int jump = 2;
+            material.SetVector(
+                "_PixelParams",
+                new Vector4(
+                    blitTextures[target].width,
+                    blitTextures[target].height,
+                    Vector2.Distance( Vector2.zero, new Vector2(blitTextures[target].width, blitTextures[target].height)),
+                    jump
+                )
+            );
+
+            int size = Mathf.Min(src.width, src.height);
+            while (size > 1)
+            {
+                target^=1; jump<<=1; size>>=1;
+                material.SetVector(
+                    "_PixelParams",
+                    new Vector4(
+                        blitTextures[target].width,
+                        blitTextures[target].height,
+                        0,
+                        jump
+                    )
+                );
+                Graphics.Blit(blitTextures[target^1], blitTextures[target], material, 1);
+            }
+            target^=1;
+            Graphics.Blit(blitTextures[target^1], blitTextures[target], material, 3);
+            return blitTextures[target];
+        }
     }
 }
   

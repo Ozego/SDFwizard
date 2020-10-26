@@ -2,16 +2,18 @@
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
-        _RCSMTex ("Texture", 2D) = "white" {}
+        _MainTex ("Main Texture", 2D) = "white" {}
+        _RCSMTex ("RCSM Texture", 2D) = "white" {}
         _ConeSteps ("_ConeSteps",Int) = 16
         _BinarySteps ("_BinarySteps",Int) = 8
         _LightSteps ("_LightSteps",Int) = 8
         _Depth ("Depth", Float) = 1.
         _NormalDepth ("Normal Depth", Float) = 1.
         _Bias ("Bias", Float) = 0.
+        _ShadowLength ("Shadow Length", Float) = 1.
         _Shadow ("Shadow", Float) = 1.
         _AO ("Ambient Occlusion", Float) = 1.
+        [Toggle(HALFSCREEN)] __01 ("Display Right Half", Float) = 0 //Will set ENABLE_SOMETHING
     }
     SubShader
     {
@@ -25,6 +27,7 @@
             #pragma fragment frag
             // make fog work
             #pragma multi_compile_fog
+            #pragma multi_compile __ HALFSCREEN
 
             #include "UnityCG.cginc"
 
@@ -67,12 +70,21 @@
             }
 
             float4 _MainTex_ST;
-            float _NormalDepth,_Bias,_Shadow,_AO;
+            float _NormalDepth, _Bias, _ShadowLength, _Shadow, _AO;
             sampler2D _MainTex, _RCSMTex;
             uint _ConeSteps, _BinarySteps, _LightSteps;
 
             fixed4 frag (v2f i) : SV_Target
             {
+            #ifdef HALFSCREEN
+                if(i.vertex.x/_ScreenParams.x>.5)
+            #else
+                if(i.vertex.x/_ScreenParams.x<.5)
+            #endif
+                {
+                    discard;
+                }
+                _Bias = max(0,_Bias);
                 float3 ray = i.ray;
                 ray.xy *= -.25;
                 float rayRatio = length(ray.xy);
@@ -108,24 +120,26 @@
 
                 for(uint ci=0; ci<_LightSteps; ci++)
                 {
-                    float4 tex = tex2D(_RCSMTex, lightPos.xy);
-                    float coneRatio = tex.z;
-                    float height = saturate(1.-tex.w-lightPos.z);
-                    float d = tex.z*height/(lightRayRatio+coneRatio+_Bias);
+                    float4 texC = tex2D(_RCSMTex, lightPos.xy);
+                    float coneRatio = texC.z;
+                    float height = saturate(1.-texC.w-lightPos.z);
+                    float d = texC.z*height/(lightRayRatio+coneRatio+_Bias);
                     lightPos += lightRay*d;
                 }
                 float3 lightSearchRange = .5*lightRay*lightPos.z;
                 float3 lightSearchPos = searchPos-lightRay*searchPos.z+lightSearchRange;
                 for(uint bi=0; bi<_BinarySteps; bi++)
                 {
-                    float4 tex = tex2D(_RCSMTex, lightSearchPos.xy);
+                    float4 texB = tex2D(_RCSMTex, lightSearchPos.xy);
                     lightSearchRange*=.5;
-                    lightSearchPos+=((lightSearchPos.z<1.-tex.w)*2.-1.)*lightSearchRange;
+                    lightSearchPos+=((lightSearchPos.z<1.-texB.w)*2.-1.)*lightSearchRange;
                 }
                 fixed4 col = 0.;
-                col.rgb = saturate(1.5-searchPos.z*_AO)*tex2D(_MainTex, searchPos.xy*_MainTex_ST.xy+_MainTex_ST.zw).rgb;
+                col.rgb = tex2D(_MainTex, searchPos.xy*_MainTex_ST.xy+_MainTex_ST.zw).rgb;
+                col.rgb *= saturate(1.5-searchPos.z*_AO);
                 col.rgb *= dot(normal,normalize(i.lightRay));
-                col.rgb -= distance(searchPos,lightSearchPos)*_Shadow;
+                float shadowDistance = distance(searchPos.xy,lightSearchPos.xy)*_ShadowLength;
+                col.rgb -= saturate(shadowDistance*exp(1.0-shadowDistance)*_Shadow);
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
             }

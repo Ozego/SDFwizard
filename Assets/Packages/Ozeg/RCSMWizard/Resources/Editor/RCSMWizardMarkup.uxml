@@ -18,7 +18,7 @@
         </en:VisualElement>
         <en:VisualElement class="horizontal">
             <en:Label class="hLabel" text="Steps:"/>
-            <en:SliderInt class="hContent" name="stepSlider" value="128" low-value="32" high-value="256"/>
+            <en:SliderInt class="hContent" name="stepSlider" value="128" low-value="32" high-value="1024"/>
             <ed:IntegerField name="stepField" class="hValue" value="128"/>
         </en:VisualElement>
         <en:VisualElement class="horizontal">
