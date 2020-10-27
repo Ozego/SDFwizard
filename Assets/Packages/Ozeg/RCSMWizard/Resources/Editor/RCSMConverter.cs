@@ -4,6 +4,11 @@ namespace Ozeg.Tools
 {
     public class RCSMConverter
     {
+        enum Algorithm
+        {
+            FloodJump,
+            PerPixel
+        }
         public static RenderTexture PackRCSM(Texture src, Texture cone, Texture normal)
         {
             RenderTexture dst = WizardUtils.NewRenderTexture(src);
@@ -63,7 +68,7 @@ namespace Ozeg.Tools
         {
             RenderTexture[] blitTextures = new RenderTexture[2];
             for (int i = 0; i < 2; i++) blitTextures[i] = WizardUtils.NewRenderTexture(src);
-            var material = new Material(Shader.Find("Hidden/RCSMWizard/PerPixel"));
+            var material = new Material(Shader.Find("Hidden/RCSMWizard/JumpFlood"));
             material.SetFloat("_Steps",steps);
 
             material.SetVector(

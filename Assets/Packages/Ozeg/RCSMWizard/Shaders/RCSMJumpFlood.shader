@@ -1,4 +1,4 @@
-﻿Shader "Hidden/RCSMWizard/PerPixel"
+﻿Shader "Hidden/RCSMWizard/JumpFlood"
 {
     Properties
     {

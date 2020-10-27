@@ -35,7 +35,6 @@ namespace Ozeg.Tools
             VisualElement vt = Resources.Load<VisualTreeAsset>("Editor/RCSMWizardMarkup").Instantiate();
             vt.styleSheets.Add(Resources.Load<StyleSheet>("Editor/RCSMWizardStyle"));
             root.Add(vt);
-            EnumField       algorithmSelect     = vt.Q<EnumField>       ("algorithmSelect");
             EnumField       normalSelect        = vt.Q<EnumField>       ("normalSelect");
             ObjectField     heightMapField      = vt.Q<ObjectField>     ("heightMapField");
             ObjectField     normalMapField      = vt.Q<ObjectField>     ("normalMapField");
@@ -43,14 +42,17 @@ namespace Ozeg.Tools
             IntegerField    stepField           = vt.Q<IntegerField>    ("stepField");
             Button          runButton           = vt.Q<Button>          ("runButton");
             EnumField       tilingSelect        = vt.Q<EnumField>       ("TilingSelect");
-            tilingSelect.Init(TextureWrapMode.Repeat);
+            EnumField       algorithmSelect     = vt.Q<EnumField>       ("AlgorithmSelect");
 
+            tilingSelect.Init(TextureWrapMode.Repeat);
             normalSelect.Init(NormalMapOptions.Import);
+            algorithmSelect.Init(RCSMAlgorithm.JumpFlood);
+
             heightMapField.objectType = typeof(Texture);
             normalMapField.objectType = typeof(Texture);
 
             normalSelect.RegisterCallback<ChangeEvent<Enum>>((e)=>{
-                switch (e.newValue)
+                switch(e.newValue)
                 {
                     case NormalMapOptions.Generate: 
                         normalMapField.parent.visible = false;
@@ -60,6 +62,14 @@ namespace Ozeg.Tools
                         break;
                     case NormalMapOptions.None:
                         normalMapField.parent.visible = false;
+                        break;
+                }
+            });
+            algorithmSelect.RegisterCallback<ChangeEvent<Enum>>((e)=>{
+                switch(e.newValue)
+                {
+                    case RCSMAlgorithm.PerPixel:
+                        if(!EditorUtility.DisplayDialog("Per Pixel Selected","Processing the map per pixel may take a long time. \nUsing Jump Flood is reccomended. \nPer Pixel should only be used where high accuracy is required.","Ok","Cancel")) algorithmSelect.value = RCSMAlgorithm.JumpFlood;
                         break;
                 }
             });
@@ -93,7 +103,13 @@ namespace Ozeg.Tools
                         case NormalMapOptions.Generate  :   normalMap = RCSMConverter.RenderNormal(heightMap as Texture2D);             break;
                         default                         :   normalMap = RCSMConverter.ImportNormal(null);                               break;
                     }
-                    Texture coneMap = RCSMConverter.RenderRCSMFloodJump(heightMap as Texture2D, stepField.value);
+                    Texture coneMap = null;
+                    switch(algorithmSelect.value)
+                    {
+                        case RCSMAlgorithm.PerPixel     :   coneMap = RCSMConverter.RenderRCSMPerPixel(heightMap as Texture2D, stepField.value);    break;
+                        case RCSMAlgorithm.JumpFlood    :   coneMap = RCSMConverter.RenderRCSMFloodJump(heightMap as Texture2D, stepField.value);   break;
+                        default                         :   coneMap = RCSMConverter.RenderRCSMFloodJump(heightMap as Texture2D, stepField.value);   break;
+                    }
                     Texture RCSMap = RCSMConverter.PackRCSM(heightMap,coneMap,normalMap);
 
                     string path = AssetDatabase.GetAssetPath(heightMap);

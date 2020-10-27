@@ -29,6 +29,10 @@
             <en:Label class="hLabel"  text="Tiling:"/>
             <ed:EnumField class="hContent" name="TilingSelect"/>
         </en:VisualElement>
+        <en:VisualElement class="horizontal">
+            <en:Label class="hLabel"  text="Algorithm:"/>
+            <ed:EnumField class="hContent" name="AlgorithmSelect"/>
+        </en:VisualElement>
         <en:Button name="runButton" text="▼ Run" />
     </en:ScrollView>
 </en:UXML>
