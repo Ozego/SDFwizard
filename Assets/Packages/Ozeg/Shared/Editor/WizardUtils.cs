@@ -43,6 +43,7 @@ namespace Ozeg.Tools
             RenderTexture.active = rt;
             tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
             tex.Apply();
+            RenderTexture.active = null;
             return tex;
         }
     }

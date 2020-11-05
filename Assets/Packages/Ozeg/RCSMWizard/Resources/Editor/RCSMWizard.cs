@@ -96,28 +96,30 @@ namespace Ozeg.Tools
                 {
                     var heightMap = heightMapField.value as Texture;
                     heightMap.wrapMode = (TextureWrapMode)tilingSelect.value;
-                    Texture normalMap = null;
+                    RenderTexture normalMap = null;
                     switch (normalSelect.value)
                     {
                         case NormalMapOptions.Import    :   normalMap = RCSMConverter.ImportNormal(normalMapField.value as Texture);    break;
                         case NormalMapOptions.Generate  :   normalMap = RCSMConverter.RenderNormal(heightMap as Texture2D);             break;
                         default                         :   normalMap = RCSMConverter.ImportNormal(null);                               break;
                     }
-                    Texture coneMap = null;
+                    RenderTexture coneMap = null;
                     switch(algorithmSelect.value)
                     {
                         case RCSMAlgorithm.PerPixel     :   coneMap = RCSMConverter.RenderRCSMPerPixel(heightMap as Texture2D, stepField.value);    break;
                         case RCSMAlgorithm.JumpFlood    :   coneMap = RCSMConverter.RenderRCSMFloodJump(heightMap as Texture2D, stepField.value);   break;
                         default                         :   coneMap = RCSMConverter.RenderRCSMFloodJump(heightMap as Texture2D, stepField.value);   break;
                     }
-                    Texture RCSMap = RCSMConverter.PackRCSM(heightMap,coneMap,normalMap);
+                    RenderTexture RCSMap = RCSMConverter.PackRCSM(heightMap,coneMap,normalMap);
 
                     string path = AssetDatabase.GetAssetPath(heightMap);
                     string newPath = path.Substring(0,path.LastIndexOf("."))+"_RCSM.png";
                     string systemPath = Application.dataPath.Substring(0,Application.dataPath.Length-6)+newPath;
                     System.IO.File.WriteAllBytes(systemPath,WizardUtils.RenderTextureToTexture2D(RCSMap as RenderTexture).EncodeToPNG());
+                    normalMap.Release();
+                    coneMap.Release();
+                    RCSMap.Release();
 
-                    
                     AssetDatabase.Refresh();
                     var importer = (TextureImporter)AssetImporter.GetAtPath(newPath);
                     var importerSettings = new TextureImporterSettings();

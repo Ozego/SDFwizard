@@ -66,8 +66,7 @@ namespace Ozeg.Tools
                         string systemPath = Application.dataPath.Substring(0,Application.dataPath.Length-6)+newPath;
                         var texture = item as Texture2D;
                         texture.wrapMode = (TextureWrapMode)tilingSelect.value;
-                        var converter = new SDFConverter();
-                        var outData = converter.RenderSDF(texture, sizeField.value, tresholdField.value, sampleField.value, channelSelect.value, modeSelect.value);
+                        var outData = SDFConverter.RenderSDF(texture, sizeField.value, tresholdField.value, sampleField.value, channelSelect.value, modeSelect.value);
                         System.IO.File.WriteAllBytes(systemPath,outData.EncodeToPNG());
                         AssetDatabase.Refresh();
                         var importer = (TextureImporter)AssetImporter.GetAtPath(newPath);

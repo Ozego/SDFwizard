@@ -62,6 +62,7 @@ namespace Ozeg.Tools
                     Graphics.Blit(src,blitTextures[target],material,1);
                 }
             }
+            blitTextures[target^1].Release();
             return blitTextures[target];
         }
         public static RenderTexture RenderRCSMFloodJump(Texture2D src, int steps)
@@ -112,6 +113,7 @@ namespace Ozeg.Tools
             }
             target^=1;
             Graphics.Blit(blitTextures[target^1], blitTextures[target], material, 3);
+            blitTextures[target^1].Release();
             return blitTextures[target];
         }
     }

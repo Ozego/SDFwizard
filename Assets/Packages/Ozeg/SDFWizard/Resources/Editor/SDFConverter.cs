@@ -5,15 +5,11 @@ namespace Ozeg.Tools
 {
     public class SDFConverter
     {
-        RenderTexture[] blitTextures = new RenderTexture[2];
-        Material material = null;
-        public SDFConverter()
+        public static Texture2D RenderSDF(Texture2D source, int distance, float treshold, int upsampling, System.Enum channel, System.Enum mode)
         {
+            Material material = null;
             material = new Material(Shader.Find("Hidden/SDFWizard/JumpFlood"));
-        }
-
-        public Texture2D RenderSDF(Texture2D source, int distance, float treshold, int upsampling, System.Enum channel, System.Enum mode)
-        {
+            RenderTexture[] blitTextures = new RenderTexture[2];
             int maxDim = Mathf.Max(source.width,source.height);
             while(maxDim<<upsampling>2048) upsampling--;
             upsampling = Mathf.Max(0,upsampling);
@@ -109,7 +105,13 @@ namespace Ozeg.Tools
             material.SetTexture("_ExoTex", exoTexture);
             material.SetTexture("_EndoTex", blitTextures[target^1]);
             Graphics.Blit(source,outTexture, material, 2);
-            return WizardUtils.RenderTextureToTexture2D(outTexture);
+            Texture2D outTexture2D = WizardUtils.RenderTextureToTexture2D(outTexture);
+            RenderTexture.active = null;
+            outTexture.Release();
+            exoTexture.Release();
+            blitTextures[0].Release();
+            blitTextures[1].Release();
+            return outTexture2D;
         }
         public enum RenderingMode
         {
