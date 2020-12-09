@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shapes_RCSM_Lit 3
+  m_Name: Shapes_RCSM_Lit 4
   m_Shader: {fileID: 4800000, guid: d26373e2f5526b2479382b5f744f23cd, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -20,26 +20,26 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 3679568d7409f8743bf97a2f41ef6e57, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
+        m_Scale: {x: 16, y: 16}
         m_Offset: {x: 0, y: 0}
     - _RCSMTex:
         m_Texture: {fileID: 2800000, guid: fe5752cdde6300c41bf4e76e46b855f9, type: 3}
         m_Scale: {x: 8, y: 8}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _AO: 0
+    - _AO: 1.05
     - _Bias: 0
-    - _BinarySteps: 6
-    - _ConeSteps: 8
-    - _Depth: 0.01
-    - _LightSteps: 0
+    - _BinarySteps: 8
+    - _ConeSteps: 32
+    - _Depth: 0.005
+    - _LightSteps: 5.21
     - _MaxAngle: 1.89
     - _MaxStep: 1
     - _NormalDepth: 0.3
     - _SCutoff: 0.25
-    - _Shadow: 0
-    - _ShadowLength: 0
+    - _Shadow: 2.46
+    - _ShadowLength: 3.06
     - _ShadowTerminator: 0.15
     - __01: 0
     m_Colors:
