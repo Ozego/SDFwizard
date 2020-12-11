@@ -18,8 +18,8 @@
         _ConeSteps ("Cone Iteration",Int) = 5
         _BinarySteps ("Binary Iteration",Int) = 5
         _Bias ("Bias", Float) = 0.
-        [Hidden]_ShadowTex("Shadow texture", 2D) = "white" {}
-        [Hidden]_ShadowDepth ("Shadow Depth", Float) = 0
+        // [Hidden]_ShadowTex("Shadow texture", 2D) = "white" {}
+        // [Hidden]_ShadowDepth ("Shadow Depth", Float) = 0
     }
     SubShader
     {
@@ -58,13 +58,14 @@
             o.worldRay = WorldSpaceViewDir(v.vertex).xyz;
         }
         fixed4 _Color, _EmissionColor;
-        float _Glossiness, _Metallic, _Occlusion, _NormalDepth, _Bias, _ShadowDepth, _Offset;
+        float _Glossiness, _Metallic, _Occlusion, _NormalDepth, _Bias, /*_ShadowDepth,*/ _Offset;
         uint _ConeSteps, _BinarySteps, _LightSteps;
+        /*
         sampler2D _ShadowTex;
         uniform float _isShadow;
         uniform float4 _sc[6];
         uniform float4 _sm[6];
-
+        */
         UNITY_INSTANCING_BUFFER_START(Props)
         UNITY_INSTANCING_BUFFER_END(Props)
 
@@ -105,19 +106,19 @@
 
             fixed4 c = tex2D (_MainTex, searchPos.xy);
             fixed4 surf = tex2D (_SurfaceTex, searchPos.xy);
-            
+            /*
             // float3 worldRay = i.worldRay;
             float3 worldPos = i.worldPos;
             worldPos += _ShadowDepth*i.worldRay/i.worldRay.y*(searchPos.z-.5);
             float s = 1.;
             for (int j = 0; j < 6; j++) s *= lerp(tex2D(_ShadowTex,mul(float2x2(_sm[j]),worldPos.xz-_sc[j].xz)+.5),1.,_sc[j].y);
             s = lerp(1., s, _isShadow);
-            
+            */
             // float emissionMask = tex2D(_EmissionTex, searchPos.xy*_EmissionTex_ST.xy+_EmissionTex_ST.zw).r;
             // o.Emission = emissionMask*_EmissionColor;
             o.Normal  = normal;
             o.Occlusion = 1.-_Occlusion*(1-surf.b);
-            o.Albedo = c.rgb*s*s*lerp(_Color,1,surf.r*(1-_Color.a));
+            o.Albedo = c.rgb*/*s*s**/lerp(_Color,1,surf.r*(1-_Color.a));
             // o.Albedo = surf;
             o.Metallic = _Metallic*surf.r;
             o.Smoothness = _Glossiness*surf.g;
